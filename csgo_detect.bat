@@ -1,0 +1,1 @@
+python csgo_detect.py --weights runs/train/csgo/weights/best.pt --device 0 --view-img
