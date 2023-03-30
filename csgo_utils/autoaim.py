@@ -43,8 +43,6 @@ class MouseController:
         closest_point = target_center_list[index]
         # 通过将距离最小的检测框的中心坐标赋值给mouse.position来移动鼠标
         self.mouse.position = (int(closest_point[0]), int(closest_point[1]))
-
-        return self.flag
         # print('The current pointer position is {0}'.format(
         #     self.mouse.position))
 

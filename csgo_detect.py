@@ -95,10 +95,9 @@ def run(
     dataset = GrabScreen(region=(0, 0, 2560, 1440))
     mouse_controller = MouseController()
     mouse_controller.start_listen()
-    flag = True
     # dataset = GrabScreen(windowed=True) 暂时不支持任意分辨率窗口化
     while True:
-        if not flag:
+        if not mouse_controller.flag:
             break
         s = "screenshot: "
         im0s = dataset.grab()
@@ -161,7 +160,7 @@ def run(
                         annotator.box_label(xyxy, label, color=colors(c, True))
                 # 如果当前鼠标控制器的锁定模式打开，传入当前帧中所有检测框的中心点
                 if mouse_controller.lock_mode:
-                    flag = mouse_controller.lock_on(target_center_list)
+                    mouse_controller.lock_on(target_center_list)
             if view_img:
                 # Stream results
                 im0 = annotator.result()
@@ -169,7 +168,7 @@ def run(
                 cv2.waitKey(1)  # 1 millisecond
 
         # Print time (inference-only)
-        LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s). status:{flag}')
+        LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s).')
 
 
 def parse_opt():
