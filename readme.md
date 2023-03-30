@@ -33,13 +33,13 @@
 需要修改对应按键的，直接修改autoaim.py的on_click函数
 
 ```python
-    def on_click(self, x, y, button, is_press):
-        # print(f"鼠标{button}键在({x}, {y})处{'按下' if is_press else '松开'}")
-        # 使用鼠标的侧键来开关自动跟枪的状态
-        if button == Button.x2 and is_press:
-            self.lock_mode = not self.lock_mode
-        # 使用鼠标右键直接退出跟踪状态
-        if button == Button.right:
-            return False
+def on_click(self, x, y, button, is_press):
+    # print(f"鼠标{button}键在({x}, {y})处{'按下' if is_press else '松开'}")
+    # 使用鼠标的侧键来开关自动跟枪的状态
+    if button == Button.x2 and is_press:
+        self.lock_mode = not self.lock_mode
+    # 使用鼠标右键直接退出跟踪状态
+    if button == Button.right:
+        self.flag = False
 ```
 
