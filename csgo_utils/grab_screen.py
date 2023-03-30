@@ -11,10 +11,10 @@ import time
 class GrabScreen:
     def __init__(self, region=None, windowed=False):
         scale_ratio = 1.25  # windows系统设置的缩放与布局
-        if not windowed:
+        if not windowed:  # 目前可以用只能支持全屏窗口化
             self.hwin = win32gui.GetDesktopWindow()
         # win32gui.FindWindow(FrameClass, FrameTitle)
-        else:
+        else:  # 目前可以抓取屏幕，但进入到游戏中存在bug
             self.hwin = win32gui.FindWindow("Valve001", "Counter-Strike: Global Offensive - Direct3D 9")
             # self.hwin = win32gui.FindWindow("ApplicationFrameInputSinkWindow", None)
 
@@ -22,7 +22,7 @@ class GrabScreen:
         self.srcdc = win32ui.CreateDCFromHandle(self.hwindc)
         self.memdc = self.srcdc.CreateCompatibleDC()
         self.bmp = win32ui.CreateBitmap()
-        if region:
+        if region:  # 直接计算抓取屏幕的范围
             self.left, self.top, x2, y2 = region
             self.width = x2 - self.left
             self.height = y2 - self.top
@@ -42,6 +42,7 @@ class GrabScreen:
 
         self.bmp.CreateCompatibleBitmap(self.srcdc, self.width, self.height)
 
+    # 释放句柄，不用每次抓取都创建对象释放对象，提高抓取效率
     def release_all(self):
         self.srcdc.DeleteDC()
         self.memdc.DeleteDC()

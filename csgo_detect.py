@@ -91,10 +91,11 @@ def run(
     model.warmup(imgsz=(1 if pt else bs, 3, *imgsz))  # warmup
     dt, seen = [0.0, 0.0, 0.0], 0
 
+    # 屏幕抓取器
     dataset = GrabScreen(region=(0, 0, 2560, 1440))
     mouse_controller = MouseController()
     mouse_controller.start_listen()
-    # dataset = GrabScreen(windowed=True)
+    # dataset = GrabScreen(windowed=True) 暂时不支持任意分辨率窗口化
     while True:
         s = "screenshot: "
         im0s = dataset.grab()
@@ -113,18 +114,21 @@ def run(
         t2 = time_sync()
         dt[0] += t2 - t1
 
-        # Inference
+        # Inference、
+        # 前向推理
         pred = model(im, augment=augment, visualize=visualize)
         t3 = time_sync()
         dt[1] += t3 - t2
 
         # NMS
+        # 非极大值抑制
         pred = non_max_suppression(pred, conf_thres, iou_thres, classes, agnostic_nms, max_det=max_det)
         dt[2] += time_sync() - t3
 
         # Second-stage classifier (optional)
         # pred = utils.general.apply_classifier(pred, classifier_model, im, im0s)
 
+        # 对每一帧图像的检测结果进行遍历
         # Process predictions
         for i, det in enumerate(pred):  # per image
             seen += 1
@@ -135,6 +139,7 @@ def run(
             if len(det):
                 # Rescale boxes from img_size to im0 size
                 det[:, :4] = scale_coords(im.shape[2:], det[:, :4], im0.shape).round()
+                # 保存所有的检测框的中心点，shape [检测框数，xy坐标]
                 target_center_list = np.zeros((len(det), 2))
                 # Print results
                 for c in det[:, -1].unique():
@@ -142,6 +147,7 @@ def run(
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
                 # Write results
                 bbox_idx = 0
+                # 获取当前帧所有的检测框，并计算检测框的中心点
                 for *xyxy, conf, cls in reversed(det):
                     target_center_list[bbox_idx, 0] = (xyxy[0].item() + xyxy[2].item()) // 2
                     target_center_list[bbox_idx, 1] = (xyxy[1].item() + xyxy[3].item()) // 2
@@ -150,6 +156,7 @@ def run(
                         c = int(cls)  # integer class
                         label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
                         annotator.box_label(xyxy, label, color=colors(c, True))
+                # 如果当前鼠标控制器的锁定模式打开，传入当前帧中所有检测框的中心点
                 if mouse_controller.lock_mode:
                     mouse_controller.lock_on(target_center_list)
             if view_img:
