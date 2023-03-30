@@ -13,6 +13,7 @@ ctypes.windll.shcore.SetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE)
 class MouseController:
     def __init__(self):
         self.lock_mode = False
+        self.flag = True
         self.mouse = Controller()
 
     def on_click(self, x, y, button, is_press):
@@ -22,7 +23,7 @@ class MouseController:
             self.lock_mode = not self.lock_mode
         # 使用鼠标右键直接退出跟踪状态
         if button == Button.right:
-            return False
+            self.flag = False
 
     def start_listen(self):
         # with Listener(on_click=self.on_click) as listener:
@@ -43,6 +44,7 @@ class MouseController:
         # 通过将距离最小的检测框的中心坐标赋值给mouse.position来移动鼠标
         self.mouse.position = (int(closest_point[0]), int(closest_point[1]))
 
+        return self.flag
         # print('The current pointer position is {0}'.format(
         #     self.mouse.position))
 
